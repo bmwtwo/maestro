@@ -1,0 +1,17 @@
+body {
+   text-align: center;
+   font-family: Arial, sans-serif;
+}
+
+#recordingBox {
+   background-color: black;
+   color: white;
+   height: 90%;
+   padding: 10px;
+   margin: 10px;
+   overflow: scroll;
+}
+
+.left {
+   text-align: left;
+}
