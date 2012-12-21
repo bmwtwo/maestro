@@ -84,7 +84,7 @@ $(document).ready(function() {
                   noteString += 'dotted-quarter" src="images/dotted-quarter.png" />';
                   break;
                case 7:
-                  noteString += 'quarter" src="images/dotted-quarter.png" />';
+                  noteString += 'dotted-quarter" src="images/dotted-quarter.png" />';
                   noteString += '<div class="tie-top dotted-quarter-tie"></div>';
                   noteString += '<div class="tie dotted-quarter-tie"></div>';
                   noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';

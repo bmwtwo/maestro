@@ -8,6 +8,7 @@ body {
    height: 90%;
    padding: 10px;
    margin: 10px;
+   white-space: nowrap;
    overflow: scroll;
    position: relative;
 }
@@ -17,7 +18,7 @@ body {
 }
 
 .note {
-   float: left;
+   display: inline-block;
    height: 48px;
 }
 
@@ -61,16 +62,16 @@ body {
 .tie {
    background-color: black;
    height: 5px;
-   margin-top: 48px;
-   float: left;
+   margin-bottom: -7px;
+   display: inline-block;
 }
 
 .tie-top {
    background-color: white;
    height: 3px;
-   margin-top: 48px;
-   float: left;
-   position: relative; /* to make it appear on top */
+   margin-bottom: -4px;
+   display: inline-block;
+   position: relative; /* to make it appear at higher z-index */
 }
 
 .quarter-tie {
