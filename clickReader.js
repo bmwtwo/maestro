@@ -22,7 +22,6 @@ $(document).ready(function() {
       var currentTime = new Date(); 
 
       clickLengths.push(currentTime - timeOfLastClick);
-      console.log(clickLengths.length);
       timeOfLastClick = currentTime;
    });
 
@@ -40,30 +39,104 @@ $(document).ready(function() {
    });
 
    function displayResults() {
-      $("#recordingBox").addClass("left");
-      $("#recordingBox").append(clickLengths[0] + ": quarter<br />");
+      // assume the first note is a quarter note, and work from high to low
+      // for the current note
+      $("#recordingBox").append('<img class="note quarter" src="images/quarter.png" />');
+      var sixteenthRef = clickLengths[0] / 4;
 
       for (var i = 1; i < clickLengths.length; i++) {
-         // assume the first note is a quarter note, and work from high to low
-         // for the current note
-         var noteType = "half";
-         // calculate how close this note is to a quarter note
-         var previousDifference = clickLengths[0]*2 - clickLengths[i];
+         var sixteenths = Math.round(clickLengths[i] / sixteenthRef);
+         var noteString = '';
 
-         var quarterDifference = Math.abs(clickLengths[0] - clickLengths[i]);
-         if (previousDifference > 0 &&
-               Math.abs(quarterDifference) < previousDifference) {
-            noteType = "quarter";
-            previousDifference = quarterDifference;
+         // place required whole notes
+         while (Math.floor(sixteenths / 16) > 0) {
+            noteString += '<img class="note whole" src="images/whole.png" />';
+            sixteenths -= 16;
+            if (sixteenths > 0) {
+               noteString += '<div class="tie-top whole-tie"></div>';
+               noteString += '<div class="tie whole-tie"></div>';
+            }
          }
 
-         var eighthDifference = Math.abs(clickLengths[0]/2 - clickLengths[i]);
-         if (quarterDifference > 0 &&
-               Math.abs(eighthDifference) < previousDifference) {
-            noteType = "eighth";
-            previousDifference = eighthDifference;
+         // place remaining notes
+         if (sixteenths > 0) {
+            noteString += '<img class="note ';
+            switch (sixteenths) {
+               case 1:
+                  noteString += 'sixteenth" src="images/sixteenth.png" />';
+                  break;
+               case 2:
+                  noteString += 'eighth" src="images/eighth.png" />';
+                  break;
+               case 3:
+                  noteString += 'dotted-eighth" src="images/dotted-eighth.png" />';
+                  break;
+               case 4:
+                  noteString += 'quarter" src="images/quarter.png" />';
+                  break;
+               case 5:
+                  noteString += 'quarter" src="images/quarter.png" />';
+                  noteString += '<div class="tie-top quarter-tie"></div>';
+                  noteString += '<div class="tie quarter-tie"></div>';
+                  noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+                  break;
+               case 6:
+                  noteString += 'dotted-quarter" src="images/dotted-quarter.png" />';
+                  break;
+               case 7:
+                  noteString += 'quarter" src="images/dotted-quarter.png" />';
+                  noteString += '<div class="tie-top dotted-quarter-tie"></div>';
+                  noteString += '<div class="tie dotted-quarter-tie"></div>';
+                  noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+                  break;
+               case 8:
+                  noteString += 'half" src="images/half.png" />';
+                  break;
+               case 9:
+                  noteString += 'half" src="images/half.png" />';
+                  noteString += '<div class="tie-top half-tie"></div>';
+                  noteString += '<div class="tie half-tie"></div>';
+                  noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+                  break;
+               case 10:
+                  noteString += 'half" src="images/half.png" />';
+                  noteString += '<div class="tie-top half-tie"></div>';
+                  noteString += '<div class="tie half-tie"></div>';
+                  noteString += '<img class="note eighth" src="images/eighth.png" />';
+                  break;
+               case 11:
+                  noteString += 'half" src="images/half.png" />';
+                  noteString += '<div class="tie-top half-tie"></div>';
+                  noteString += '<div class="tie half-tie"></div>';
+                  noteString += '<img class="note dotted-eighth" src="images/dotted-eighth.png" />';
+                  break;
+               case 12:
+                  noteString += 'dotted-half" src="images/dotted-half.png" />';
+                  break;
+               case 13:
+                  noteString += 'dotted-half" src="images/dotted-half.png" />';
+                  noteString += '<div class="tie-top dotted-half-tie"></div>';
+                  noteString += '<div class="tie dotted-half-tie"></div>';
+                  noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+                  break;
+               case 14:
+                  noteString += 'dotted-half" src="images/dotted-half.png" />';
+                  noteString += '<div class="tie-top dotted-half-tie"></div>';
+                  noteString += '<div class="tie dotted-half-tie"></div>';
+                  noteString += '<img class="note eighth" src="images/eighth.png" />';
+                  break;
+               case 15:
+                  noteString += 'dotted-half" src="images/dotted-half.png" />';
+                  noteString += '<div class="tie-top dotted-half-tie"></div>';
+                  noteString += '<div class="tie dotted-half-tie"></div>';
+                  noteString += '<img class="note dotted-eighth" src="images/dotted-eighth.png" />';
+                  break;
+               default:
+                  console.log("tried to add a " + (sixteenths%16) + "/16");
+            }
          }
-         $("#recordingBox").append(clickLengths[i] + ": " + noteType + "<br />");
+
+         $("#recordingBox").append(noteString);
       }
    }
 });
