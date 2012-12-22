@@ -4,7 +4,6 @@ var numberOfBars;
 
 $(document).ready(function() {
    clickLengths = new Array();
-   numberOfBars = 0;
 
    $("#recordingBox").on("click", function() {
       if ($("#theButton").attr("class") == "waiting") {
@@ -36,20 +35,29 @@ $(document).ready(function() {
          $(this).removeClass("recording").children("p").html("Done!");
          clickLengths.push(new Date() - timeOfLastClick);
          $("#recordingBox").addClass("left");
+         $(".menu").removeClass("hidden");
          displayResults();
       }
    });
 
-   function displayResults() {
-      // assume the first note is a quarter note, and work from high to low
-      // for the current note
-      $("#recordingBox").append('<img class="note quarter" src="images/quarter.png" />');
-      var sixteenthRef   = clickLengths[0] / 4;
-      var remainingInBar = 12; // sixteenths remaining in this 4:4 bar
+   $(".menuNote").on("click", function() {
+      var sixteenths = parseInt($(this).attr("data-length"));
+      $("#noteContainer").html('');
+      displayResults(sixteenths);
+   });
+
+   function displayResults(lengthOfFirstNote) {
+      // if not specified, assume the first note is a quarter note
+      if (typeof(lengthOfFirstNote) === "undefined") var lengthOfFirstNote = 4;
+
+      numberOfBars = 0;
+      var noteString = placeNonWholeNote(lengthOfFirstNote);
+      var sixteenthRef   = clickLengths[0] / lengthOfFirstNote;
+      // sixteenths remaining in this 4:4 bar 
+      var remainingInBar = 16 - lengthOfFirstNote;
 
       for (var i = 1; i < clickLengths.length; i++) {
          var sixteenths = Math.round(clickLengths[i] / sixteenthRef);
-         var noteString = '';
 
          // Fill the remainder of this bar (if necessary)
          // It is not necessary if the bar is empty (just fill in whole notes)
@@ -76,9 +84,8 @@ $(document).ready(function() {
                remainingInBar = 16;
             }
          }
-
-         $("#recordingBox").append(noteString);
       }
+      $("#noteContainer").append(noteString);
 
       function placeWholeNotes(sixteenths) {
          var noteString = '';

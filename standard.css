@@ -18,6 +18,7 @@ body {
    color: white;
    background-color: blue;
    height: 7%;
+   cursor: pointer;
 }
 
 #theButton:hover {
@@ -33,6 +34,59 @@ body {
 
 .left {
    text-align: left;
+}
+
+.hidden {
+   display: none;
+}
+
+.menu {
+   text-align: left;
+   padding: 0;
+}
+
+.menu li {
+   margin-top: 25px;
+   display: inline-block;
+   vertical-align: top;
+}
+
+.menu li:hover > .submenu {
+   display: block;
+}
+
+.menu li > p {
+   margin: 0;
+   color: white;
+   background-color: blue;
+   padding: 10px;
+   border-right: 1px solid white;
+   cursor: pointer;
+}
+
+.menu li > p:hover {
+   background-color: #5588FF;
+}
+
+.submenu {
+   color: black;
+   background-color: white;
+   border: 1px solid black;
+   display: none;
+}
+
+.submenu li {
+   margin: 0;
+   display: list-item;
+   cursor: pointer;
+}
+
+.submenu li:hover {
+   background-color: #CCEEFF;
+}
+
+.menuNote img {
+   height: 24px;
 }
 
 .note {
