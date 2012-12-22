@@ -1,8 +1,10 @@
 var clickLengths;    // time between each click
 var timeOfLastClick;
+var numberOfBars;
 
 $(document).ready(function() {
    clickLengths = new Array();
+   numberOfBars = 0;
 
    $("#recordingBox").on("click", function() {
       if ($("#theButton").attr("class") == "waiting") {
@@ -212,6 +214,7 @@ $(document).ready(function() {
    }
 
    function placeBarLine() {
-      return '<div class="barline"></div>';
+      numberOfBars++;
+      return '<div class="barline"></div><p class="barNumber">' + numberOfBars + '</p>';
    }
 });

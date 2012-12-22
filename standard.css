@@ -125,3 +125,11 @@ body {
    margin-bottom: -16px;
    background-color: black;
 }
+
+.barNumber {
+   display: inline-block;
+   margin-top: -16px;
+   vertical-align: top;
+   margin-left: -5px;
+   width: 5px;
+}
