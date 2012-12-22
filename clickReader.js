@@ -1,9 +1,15 @@
 var clickLengths;    // time between each click
 var timeOfLastClick;
 var numberOfBars;
+var selectedNoteID;
+var noteCount;       // number of notes in the song
+var firstNoteLength; // number of sixteenths in first note of the song
 
 $(document).ready(function() {
-   clickLengths = new Array();
+   // initialize variables and set defaults
+   clickLengths   = new Array();
+   selectedNoteID = null;
+   firstNoteLength = 4;
 
    $("#recordingBox").on("click", function() {
       if ($("#theButton").attr("class") == "waiting") {
@@ -40,23 +46,51 @@ $(document).ready(function() {
       }
    });
 
-   $(".menuNote").on("click", function() {
-      var sixteenths = parseInt($(this).attr("data-length"));
-      $("#noteContainer").html('');
-      displayResults(sixteenths);
+   $(document).on("click", ".note", function() {
+      // you can't edit the first note via this menu
+      if ($(this).attr("data-note-id") === "0") return;
+
+      if (selectedNoteID === null) {
+         $("#correctNoteMenu").parent().removeClass("disabled");
+      }
+      else {
+         $('[data-note-id="' + selectedNoteID + '"]').removeClass("selected");
+      }
+         
+      var noteID = $(this).attr("data-note-id");
+      $('[data-note-id="' + noteID + '"]').addClass("selected");
+      selectedNoteID = noteID;
    });
 
-   function displayResults(lengthOfFirstNote) {
-      // if not specified, assume the first note is a quarter note
-      if (typeof(lengthOfFirstNote) === "undefined") var lengthOfFirstNote = 4;
+   $(".firstNoteOption").on("click", function() {
+      firstNoteLength = parseInt($(this).attr("data-length"));
+      $("#noteContainer").html('');
+      selectedNoteID = null;
+      $("#correctNoteMenu").parent().addClass("disabled");
+      displayResults();
+   });
 
+   $(".correctionOption").on("click", function() {
+      var thisNoteLength = parseInt($(this).attr("data-length"));
+
+      var scalingRatio = thisNoteLength / firstNoteLength;
+      clickLengths[selectedNoteID] = clickLengths[0] * scalingRatio;
+      $("#noteContainer").html('');
+      selectedNoteID = null;
+      $("#correctNoteMenu").parent().addClass("disabled");
+      displayResults();
+   });
+
+   function displayResults() {
       numberOfBars = 0;
-      var noteString = placeNonWholeNote(lengthOfFirstNote);
-      var sixteenthRef   = clickLengths[0] / lengthOfFirstNote;
+      noteCount    = 0;
+      var noteString = placeNonWholeNote(firstNoteLength);
+      var sixteenthRef   = clickLengths[0] / firstNoteLength;
       // sixteenths remaining in this 4:4 bar 
-      var remainingInBar = 16 - lengthOfFirstNote;
+      var remainingInBar = 16 - firstNoteLength;
 
       for (var i = 1; i < clickLengths.length; i++) {
+         noteCount++;
          var sixteenths = Math.round(clickLengths[i] / sixteenthRef);
 
          // Fill the remainder of this bar (if necessary)
@@ -90,7 +124,7 @@ $(document).ready(function() {
       function placeWholeNotes(sixteenths) {
          var noteString = '';
          while (Math.floor(sixteenths / 16) > 0) {
-            noteString += '<img class="note whole" src="images/whole.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note whole" src="images/whole.png" />';
             sixteenths -= 16;
             if (sixteenths > 0) {
                noteString += placeTie(16);
@@ -111,7 +145,7 @@ $(document).ready(function() {
    // This seems like it might have a more elegant solution. I'll try to return
    // to this when I'm no longer in a rush to finish it by Christmas.
    function placeNonWholeNote(sixteenths) {
-      var noteString = '<img class="note ';
+      var noteString = '<img data-note-id="' + noteCount + '" class="note ';
       switch (sixteenths) {
          case 1:
             noteString += 'sixteenth" src="images/sixteenth.png" />';
@@ -128,7 +162,7 @@ $(document).ready(function() {
          case 5:
             noteString += 'quarter" src="images/quarter.png" />';
             noteString += placeTie(4);
-            noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note sixteenth" src="images/sixteenth.png" />';
             break;
          case 6:
             noteString += 'dotted-quarter" src="images/dotted-quarter.png" />';
@@ -136,7 +170,7 @@ $(document).ready(function() {
          case 7:
             noteString += 'dotted-quarter" src="images/dotted-quarter.png" />';
             noteString += placeTie(6);
-            noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note sixteenth" src="images/sixteenth.png" />';
             break;
          case 8:
             noteString += 'half" src="images/half.png" />';
@@ -144,17 +178,17 @@ $(document).ready(function() {
          case 9:
             noteString += 'half" src="images/half.png" />';
             noteString += placeTie(8);
-            noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note sixteenth" src="images/sixteenth.png" />';
             break;
          case 10:
             noteString += 'half" src="images/half.png" />';
             noteString += placeTie(8);
-            noteString += '<img class="note eighth" src="images/eighth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note eighth" src="images/eighth.png" />';
             break;
          case 11:
             noteString += 'half" src="images/half.png" />';
             noteString += placeTie(8);
-            noteString += '<img class="note dotted-eighth" src="images/dotted-eighth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note dotted-eighth" src="images/dotted-eighth.png" />';
             break;
          case 12:
             noteString += 'dotted-half" src="images/dotted-half.png" />';
@@ -162,17 +196,17 @@ $(document).ready(function() {
          case 13:
             noteString += 'dotted-half" src="images/dotted-half.png" />';
             noteString += placeTie(12);
-            noteString += '<img class="note sixteenth" src="images/sixteenth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note sixteenth" src="images/sixteenth.png" />';
             break;
          case 14:
             noteString += 'dotted-half" src="images/dotted-half.png" />';
             noteString += placeTie(12);
-            noteString += '<img class="note eighth" src="images/eighth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note eighth" src="images/eighth.png" />';
             break;
          case 15:
             noteString += 'dotted-half" src="images/dotted-half.png" />';
             noteString += placeTie(12);
-            noteString += '<img class="note dotted-eighth" src="images/dotted-eighth.png" />';
+            noteString += '<img data-note-id="' + noteCount + '" class="note dotted-eighth" src="images/dotted-eighth.png" />';
             break;
          default:
             console.log("tried to add a " + sixteenths + "/16 note");

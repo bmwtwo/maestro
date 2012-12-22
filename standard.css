@@ -40,6 +40,14 @@ body {
    display: none;
 }
 
+.disabled {
+   opacity: 0.25;
+}
+
+.selected {
+   background-color: #CCEEFF;
+}
+
 .menu {
    text-align: left;
    padding: 0;
@@ -51,7 +59,7 @@ body {
    vertical-align: top;
 }
 
-.menu li:hover > .submenu {
+.menu li:not(.disabled):hover > .submenu {
    display: block;
 }
 
@@ -61,16 +69,20 @@ body {
    background-color: blue;
    padding: 10px;
    border-right: 1px solid white;
+}
+
+.menu li:not(.disabled) > p {
    cursor: pointer;
 }
 
-.menu li > p:hover {
+.menu li:not(.disabled) > p:hover {
    background-color: #5588FF;
 }
 
 .submenu {
    color: black;
    background-color: white;
+   margin: 0px -1px;
    border: 1px solid black;
    display: none;
 }
@@ -85,7 +97,7 @@ body {
    background-color: #CCEEFF;
 }
 
-.menuNote img {
+.submenu img {
    height: 24px;
 }
 
