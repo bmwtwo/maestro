@@ -9,7 +9,7 @@ $(document).ready(function() {
    $("#recordingBox").on("click", function() {
       if ($("#theButton").attr("class") == "waiting") {
          timeOfLastClick = new Date();
-         $("#theButton").removeClass("waiting").addClass("recording").html("Stop");
+         $("#theButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
          $(this).children("p").fadeOut();
          return;
       }
@@ -29,11 +29,11 @@ $(document).ready(function() {
 
    $("#theButton").on("click", function() {
       if ($(this).attr("class") == "start") {
-         $(this).html("Waiting...").removeClass("start").addClass("waiting");
+         $(this).removeClass("start").addClass("waiting").children("p").html("Waiting...");
          $(".instructions").html("When you're ready, click anywhere inside this box to the beat of your music. Click the stop button when you want the last note to end.");
       }
       else if ($(this).attr("class") == "recording") {
-         $(this).removeClass("recording").html("Done!").attr("disabled", "disabled");
+         $(this).removeClass("recording").children("p").html("Done!");
          clickLengths.push(new Date() - timeOfLastClick);
          $("#recordingBox").addClass("left");
          displayResults();
