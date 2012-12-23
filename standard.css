@@ -10,7 +10,8 @@ body {
    padding: 1.5% 0.5%;;
    margin: 0.5%;
    white-space: nowrap;
-   overflow: scroll;
+   overflow-x: scroll;
+   overflow-y: hidden;
    position: relative;
 }
 
@@ -49,6 +50,7 @@ body {
 }
 
 .menu {
+   position: fixed;
    text-align: left;
    padding: 0;
 }
