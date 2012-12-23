@@ -64,10 +64,7 @@ $(document).ready(function() {
 
    $(".firstNoteOption").on("click", function() {
       firstNoteLength = parseInt($(this).attr("data-length"));
-      $("#noteContainer").html('');
-      selectedNoteID = null;
-      $("#correctNoteMenu").parent().addClass("disabled");
-      displayResults();
+      repaintScore();
    });
 
    $(".correctionOption").on("click", function() {
@@ -75,10 +72,7 @@ $(document).ready(function() {
 
       var scalingRatio = thisNoteLength / firstNoteLength;
       clickLengths[selectedNoteID] = clickLengths[0] * scalingRatio;
-      $("#noteContainer").html('');
-      selectedNoteID = null;
-      $("#correctNoteMenu").parent().addClass("disabled");
-      displayResults();
+      repaintScore();
    });
 
    function displayResults() {
@@ -121,19 +115,21 @@ $(document).ready(function() {
       }
       $("#noteContainer").append(noteString);
 
-      function placeWholeNotes(sixteenths) {
-         var noteString = '';
-         while (Math.floor(sixteenths / 16) > 0) {
-            noteString += '<img data-note-id="' + noteCount + '" class="note whole" src="images/whole.png" />';
-            sixteenths -= 16;
-            if (sixteenths > 0) {
-               noteString += placeTie(16);
-            }
-            noteString += placeBarLine();
-         }
+      placeReferenceLines(16 * (numberOfBars+1) - remainingInBar);
+   }
 
-         return noteString;
+   function placeWholeNotes(sixteenths) {
+      var noteString = '';
+      while (Math.floor(sixteenths / 16) > 0) {
+         noteString += '<img data-note-id="' + noteCount + '" class="note whole" src="images/whole.png" />';
+         sixteenths -= 16;
+         if (sixteenths > 0) {
+            noteString += placeTie(16);
+         }
+         noteString += placeBarLine();
       }
+
+      return noteString;
    }
 
    function fillRemainderOfBar(sixteenths) {
@@ -257,5 +253,28 @@ $(document).ready(function() {
    function placeBarLine() {
       numberOfBars++;
       return '<div class="barline"></div><p class="barNumber">' + numberOfBars + '</p>';
+   }
+
+   function placeReferenceLines(sixteenths) {
+      for (var i = 0; i < 2*sixteenths; i++) { // lines are spaced as 1/32 notes
+         var lineString = '<div class="timingLine';
+         if (i % 32 == 0) {
+            lineString += '1';
+         } else if (i % 8 == 0) {
+            lineString += '2';
+         } else if (i % 4 == 0) {
+            lineString += '3';
+         } else {
+            lineString += '4';
+         }
+         $("#timingLineContainer").append(lineString + '" style="left: ' + (10*i) + 'px"></div>');
+      }
+   }
+
+   function repaintScore() {
+      $("#noteContainer").html('<div id="timingLineContainer"></div>');
+      selectedNoteID = null;
+      $("#correctNoteMenu").parent().addClass("disabled");
+      displayResults();
    }
 });
