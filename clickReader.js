@@ -4,6 +4,9 @@ var numberOfBars;
 var selectedNoteID;
 var noteCount;       // number of notes in the song
 var firstNoteLength; // number of sixteenths in first note of the song
+var startTime;       // used to determine total runtime of the song
+var runTime;         // total length of song
+var totalSixteenths; // used to determine beats per minute
 
 $(document).ready(function() {
    // initialize variables and set defaults
@@ -14,6 +17,8 @@ $(document).ready(function() {
    $("#recordingBox").on("click", function() {
       if ($("#theButton").attr("class") == "waiting") {
          timeOfLastClick = new Date();
+         startTime = timeOfLastClick;
+
          $("#theButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
          $(this).children("p").fadeOut();
          return;
@@ -40,6 +45,8 @@ $(document).ready(function() {
       else if ($(this).attr("class") == "recording") {
          $(this).removeClass("recording").children("p").html("Done!");
          clickLengths.push(new Date() - timeOfLastClick);
+         runTime = (new Date() - startTime) / 1000;
+
          $("#recordingBox").addClass("left");
          $(".menu").removeClass("hidden");
          displayResults();
@@ -73,6 +80,11 @@ $(document).ready(function() {
       var scalingRatio = thisNoteLength / firstNoteLength;
       clickLengths[selectedNoteID] = clickLengths[0] * scalingRatio;
       repaintScore();
+   });
+
+   $("#minutesInput, #secondsInput, #centisecondsInput").on("click", function() {
+      updateRuntime();
+      updateRuntimeDisplay();
    });
 
    function displayResults() {
@@ -115,7 +127,10 @@ $(document).ready(function() {
       }
       $("#noteContainer").append(noteString);
 
-      placeReferenceLines(16 * (numberOfBars+1) - remainingInBar);
+      totalSixteenths = 16 * (numberOfBars+1) - remainingInBar;
+      placeReferenceLines();
+      updateRuntimeDisplay();
+      updateRuntimeInputs();
    }
 
    function placeWholeNotes(sixteenths) {
@@ -255,8 +270,8 @@ $(document).ready(function() {
       return '<div class="barline"></div><p class="barNumber">' + numberOfBars + '</p>';
    }
 
-   function placeReferenceLines(sixteenths) {
-      for (var i = 0; i < 2*sixteenths; i++) { // lines are spaced as 1/32 notes
+   function placeReferenceLines() {
+      for (var i = 0; i < 2*totalSixteenths; i++) { // lines are spaced as 1/32 notes
          var lineString = '<div class="timingLine';
          if (i % 32 == 0) {
             lineString += '1';
@@ -276,5 +291,45 @@ $(document).ready(function() {
       selectedNoteID = null;
       $("#correctNoteMenu").parent().addClass("disabled");
       displayResults();
+   }
+
+   function updateRuntime() {
+      runTime = 60 * parseInt($("#minutesInput").val());
+      runTime += parseInt($("#secondsInput").val());
+      runTime += parseInt($("#centisecondsInput").val()) / 100;
+   }
+
+   function updateRuntimeDisplay() {
+      var minutes = Math.floor(runTime / 60);
+      $("#runTime").html(minutes);
+
+      var seconds = Math.floor(runTime % 60);
+      $("#runTime").append(':' + pad(seconds, 2));
+
+      var centiseconds = Math.round(runTime*100 % 100);
+      $("#runTime").append(':' + pad(centiseconds, 2));
+
+      var beats = totalSixteenths / 4;
+      $("#runTime").append(' | ' + Math.round(beats * 60 / runTime) + ' bpm');
+   }
+
+   function updateRuntimeInputs() {
+      var minutes = Math.floor(runTime / 60);
+      $("#minutesInput").val(minutes);
+
+      var seconds = Math.floor(runTime % 60);
+      $("#secondsInput").val(seconds);
+
+      var centiseconds = Math.round(runTime*100 % 100);
+      $("#centisecondsInput").val(centiseconds);
+   }
+
+   // taken from http://www.electrictoolbox.com/pad-number-zeroes-javascript/
+   function pad(number, length) {
+      var str = '' + number;
+      while (str.length < length) {
+         str = '0' + str;
+      }
+      return str;
    }
 });
