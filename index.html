@@ -10,11 +10,18 @@
          <p>Start Recording</p>
       </div>
       <div id="recordingBox">
-         <div id="noteContainer" class="left">
-            <div id="timingLineContainer"></div>
+         <div id="labelColumn" class="hidden">
+            <p>light 1:</p>
+            <p>light 2:</p>
+            <p>light 3:</p>
+            <p>light 4:</p>
          </div>
-         <p class="instructions"></p>
-         <ul class="menu hidden">
+         <div id="contentColumn">
+            <div id="noteContainer" class="left">
+               <div id="timingLineContainer"></div>
+            </div>
+            <p class="instructions"></p>
+            <ul class="menu hidden">
             <li>
                <p>First note not a quarter note?</p>
                <div class="submenu">
@@ -79,6 +86,7 @@
                </div>
             </li>
          </ul>
+         </div>
       </div>
    </body>
 </html>

@@ -33,6 +33,27 @@ body {
    margin-top: -0.5em;
 }
 
+#contentColumn , #labelColumn {
+   float: left;
+}
+
+#contentColumn {
+   width: 95%;
+}
+
+#labelColumn {
+   padding-top: 300px;
+   width: 5%;
+}
+
+#labelColumn p {
+   margin-bottom: 50px;
+}
+
+#noteContainer {
+   position: relative;
+}
+
 .left {
    text-align: left;
 }
@@ -246,8 +267,8 @@ body {
    position: absolute;
    z-index: -1;
    top: 90px;
-   left: 14px;
-   height: 100%;
+   left: 7px;
+   height: 1000px;
 }
 
 .timingLine1, .timingLine2, .timingLine3, .timingLine4 {

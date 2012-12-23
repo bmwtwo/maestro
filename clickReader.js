@@ -20,7 +20,7 @@ $(document).ready(function() {
          startTime = timeOfLastClick;
 
          $("#theButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
-         $(this).children("p").fadeOut();
+         $(".instructions").fadeOut();
          return;
       }
 
@@ -48,7 +48,7 @@ $(document).ready(function() {
          runTime = (new Date() - startTime) / 1000;
 
          $("#recordingBox").addClass("left");
-         $(".menu").removeClass("hidden");
+         $(".menu, #labelColumn").removeClass("hidden");
          displayResults();
       }
    });
