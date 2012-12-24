@@ -15,18 +15,21 @@ body {
    position: relative;
 }
 
-#theButton {
+.largeButton {
    color: white;
    background-color: blue;
    height: 7%;
+   margin-bottom: 0.5em;
    cursor: pointer;
+   width: 50%;
+   float:left;
 }
 
-#theButton:hover {
+.largeButton:hover {
    background-color: #3355FF;
 }
 
-#theButton p {
+.largeButton p {
    line-height: 1em;
    position: relative;
    top: 50%;
