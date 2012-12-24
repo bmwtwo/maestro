@@ -13,19 +13,44 @@ $(document).ready(function() {
    clickLengths   = new Array();
    selectedNoteID = null;
    firstNoteLength = 4;
+   $("#saveDialog").dialog({ autoOpen: false, modal: true });
+   $("#loadDialog").dialog({
+      autoOpen: false,
+      modal:    true,
+      buttons:  [ { text: "Load", click: function() {
+                     $(this).attr("data-loaded", "true");
+                     $(this).dialog("close");
+                     loadSong($(this).children("textarea").val());
+                  } },
+                  { text: "Cancel", click: function() {
+                     $(this).dialog("close");
+                  } }
+      ],
+      close:    function() {
+         // if the load button was pressed:
+         if ($(this).attr("data-loaded") === "true") {
+            $("#loadButton").slideUp();
+            return;
+         }
+         // else
+         $("#loadButton").animate({ width: "50%" }, function() {
+            $("#newButton").slideDown();
+         });
+      }
+   });
 
    $("#recordingBox").on("click", function() {
-      if ($("#theButton").attr("class") == "waiting") {
+      if ($("#newButton").hasClass("waiting")) {
          timeOfLastClick = new Date();
          startTime = timeOfLastClick;
 
-         $("#theButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
-         $(".instructions").fadeOut();
+         $("#newButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
+         $(this).children("p").fadeOut();
          return;
       }
 
       // only record click information if the user has asked you to
-      if ($("#theButton").attr("class") != "recording") return;
+      if (!$("#newButton").hasClass("recording")) return;
 
       // else:
       // Store the current time in a varable throughout computations in an
@@ -37,20 +62,31 @@ $(document).ready(function() {
       timeOfLastClick = currentTime;
    });
 
-   $("#theButton").on("click", function() {
-      if ($(this).attr("class") == "start") {
-         $(this).removeClass("start").addClass("waiting").children("p").html("Waiting...");
-         $(".instructions").html("When you're ready, click anywhere inside this box to the beat of your music. Click the stop button when you want the last note to end.");
+   $("#newButton").on("click", function() {
+      if ($(this).hasClass("start")) {
+         $("#loadButton").slideUp(function() {
+            $("#newButton").animate({ width: '100%' }, function() {
+               $(this).removeClass("start").addClass("waiting").children("p").html("Waiting...");
+               $(".instructions").html("When you're ready, click anywhere inside this box to the beat of your music. Click the stop button when you want the last note to end.");
+            });
+         });
       }
-      else if ($(this).attr("class") == "recording") {
-         $(this).removeClass("recording").children("p").html("Done!");
+      else if ($(this).hasClass("recording")) {
+         $(this).removeClass("recording").slideUp();
          clickLengths.push(new Date() - timeOfLastClick);
          runTime = (new Date() - startTime) / 1000;
 
-         $("#recordingBox").addClass("left");
-         $(".menu, #labelColumn").removeClass("hidden");
          displayResults();
       }
+   });
+
+   $("#loadButton").on("click", function() {
+      $(this).css({ float: "right"});
+      $("#newButton").slideUp(function() {
+         $("#loadButton").animate({ width: '100%'}, function() {
+            $("#loadDialog").dialog("open");
+         });
+      });
    });
 
    $(document).on("click", ".note", function() {
@@ -87,7 +123,22 @@ $(document).ready(function() {
       updateRuntimeDisplay();
    });
 
+   $("#save").on("click", function() {
+      var sixteenthRef   = clickLengths[0] / firstNoteLength;
+      output = firstNoteLength + ',';
+      for (var i = 1; i < clickLengths.length; i++) {
+         var sixteenths = Math.round(clickLengths[i] / sixteenthRef);
+         output += sixteenths + ',';
+      }
+      output += runTime;
+      $("#saveDialog").children("textarea").val(output);
+      $("#saveDialog").dialog("open");
+   });
+
    function displayResults() {
+      $("#recordingBox").addClass("left");
+      $(".menu, #labelColumn").removeClass("hidden");
+
       numberOfBars = 0;
       noteCount    = 0;
       var noteString = placeNonWholeNote(firstNoteLength);
@@ -322,6 +373,16 @@ $(document).ready(function() {
 
       var centiseconds = Math.round(runTime*100 % 100);
       $("#centisecondsInput").val(centiseconds);
+   }
+
+   function loadSong(input) {
+      var inputArray = input.split(",");
+      runTime = inputArray.pop();
+      for (var i in inputArray) {
+         clickLengths.push(parseInt(inputArray[i]));
+      }
+      firstNoteLength = clickLengths[0];
+      displayResults();
    }
 
    // taken from http://www.electrictoolbox.com/pad-number-zeroes-javascript/

@@ -2,14 +2,20 @@
    <head>
       <title>Maestro!</title>
       <link rel="stylesheet" type="text/css" href="standard.css" />
+      <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" />
+
       <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+      <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
       <script src="clickReader.js"></script>
    </head>
    <body>
-      <div id="theButton" class="start">
+      <div class="start largeButton" id="newButton">
          <p>Start Recording</p>
       </div>
-      <div id="recordingBox">
+      <div class="largeButton" id="loadButton">
+         <p>Load</p>
+      </div>
+      <div style="clear: both;" id="recordingBox">
          <div id="labelColumn" class="hidden">
             <p>light 1:</p>
             <p>light 2:</p>
@@ -84,9 +90,17 @@
                   <p>Song length:</p>
                   <input type="number" id="minutesInput" max="99" min="0"><b> : </b><input type="number" id="secondsInput" max="99" min="0"><b> : </b><input type="number" id="centisecondsInput" max="99" min="0">
                </div>
+            </li><li>
+               <p id="save">Save!</p>
             </li>
          </ul>
          </div>
+      </div>
+      <div id="saveDialog" title="Copy this data to a file on your computer">
+         <textarea></textarea>
+      </div>
+      <div id="loadDialog" title="Paste saved data below">
+         <textarea></textarea>
       </div>
    </body>
 </html>
