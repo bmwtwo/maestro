@@ -57,6 +57,33 @@ body {
    position: relative;
 }
 
+.lightBar {
+   position: absolute;
+   left: 0px;
+   width: 161px;
+   height: 17px;
+}
+
+.light1 {
+   top: 225px;
+   background-color: orange;
+}
+
+.light2 {
+   top: 295px;
+   background-color: red;
+}
+
+.light3 {
+   top: 365px;
+   background-color: blue;
+}
+
+.light4 {
+   top: 435px;
+   background-color: green;
+}
+
 .left {
    text-align: left;
 }

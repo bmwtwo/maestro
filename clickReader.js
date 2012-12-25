@@ -45,7 +45,7 @@ $(document).ready(function() {
          startTime = timeOfLastClick;
 
          $("#newButton").removeClass("waiting").addClass("recording").children("p").html("Stop");
-         $(this).children("p").fadeOut();
+         $(".instructions").fadeOut();
          return;
       }
 
