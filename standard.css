@@ -57,11 +57,15 @@ body {
    position: relative;
 }
 
-.lightBar {
+/* this must be specific enough to override .ui-resizable's position:relative */
+#noteContainer .lightBar {
    position: absolute;
-   left: 0px;
-   width: 161px;
+   width: 10px;
    height: 17px;
+}
+
+.lightBarSelected {
+   opacity: 0.5;
 }
 
 .light1 {
@@ -102,6 +106,7 @@ body {
 
 .menu {
    position: fixed;
+   z-index: 2;
    text-align: left;
    padding: 0;
 }
@@ -295,13 +300,14 @@ body {
 
 #timingLineContainer {
    position: absolute;
-   z-index: -1;
+   z-index: 1;
    top: 90px;
    left: 7px;
    height: 1000px;
+   width: 100%;
 }
 
-.timingLine1, .timingLine2, .timingLine3, .timingLine4 {
+.timingLine {
    position: absolute;
    top: 1%;
    height: 98%;

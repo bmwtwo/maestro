@@ -7,11 +7,13 @@ var firstNoteLength; // number of sixteenths in first note of the song
 var startTime;       // used to determine total runtime of the song
 var runTime;         // total length of song
 var totalSixteenths; // used to determine beats per minute
+var $selectedLightBar;
 
 $(document).ready(function() {
    // initialize variables and set defaults
    clickLengths   = new Array();
    selectedNoteID = null;
+   $selectedLightBar = null;
    firstNoteLength = 4;
    $("#saveDialog").dialog({ autoOpen: false, modal: true });
    $("#loadDialog").dialog({
@@ -36,6 +38,16 @@ $(document).ready(function() {
          $("#loadButton").animate({ width: "50%" }, function() {
             $("#newButton").slideDown();
          });
+      }
+   });
+
+   $(document).on("keydown", function(e) {
+      if (event.keyCode == 8) { // delete key was pressed
+         if ($selectedLightBar !== null) {
+            $selectedLightBar.remove();
+            $selectedLightBar = null;
+         }
+         return false;
       }
    });
 
@@ -105,6 +117,57 @@ $(document).ready(function() {
       selectedNoteID = noteID;
    });
 
+   $(document).on("click", "#timingLineContainer", function(e) {
+      var arr = $(".timingLine");
+      // -2 to prevent lightBars running off the end of the score
+      findLine(e, arr, 0, arr.length-2); 
+   });
+
+   // binary search for the line closest to the position you clicked
+   function findLine(e, arr, lo, hi) {
+      if (hi < lo) return;
+
+      var mid = lo + Math.floor( (hi-lo)/2 );
+      var $line = $(arr[mid]);
+      var difference = $line.offset().left - e.pageX;
+      //console.log("hi is " + hi + ", lo is " + lo + ", mid is " + mid);
+
+      if (difference <= 0 && difference > -10) {
+         // find which row lightBar should go in
+         var lightBarClass;
+         if (e.pageY >= $('#light4Label').offset().top) {
+            lightBarClass = 'light4';
+         } else if (e.pageY >= $('#light3Label').offset().top) {
+            lightBarClass = 'light3';
+         } else if (e.pageY >= $('#light2Label').offset().top) {
+            lightBarClass = 'light2';
+         } else if (e.pageY >= $('#light1Label').offset().top) {
+            lightBarClass = 'light1';
+         } else {
+            return; // the user didn't click near one of the labels
+         }
+
+         // only add a lightBar if one does not already exist at this position
+         $existingLightBar = $('.lightBar.' + lightBarClass + '[data-offset="' + $line.position().left + '"]');
+         if ($existingLightBar.length > 0) {
+            if ($selectedLightBar !== null) $selectedLightBar.removeClass('lightBarSelected');
+            $existingLightBar.addClass('lightBarSelected');
+            $selectedLightBar = $existingLightBar;
+            return;
+         }
+
+         var lightBar = '<div class="lightBar ' + lightBarClass + '" data-light="light1" style="left: ' + $line.css('left') + '" data-offset="' + $line.position().left + '"></div>'; 
+         $('#timingLineContainer').append(lightBar);
+         //makeDraggable($('.lightBar[style="left: ' + $line.css('left') + '"]'));
+      }
+      else if (difference > 0) {
+         findLine(e, arr, lo, mid-1);
+      }
+      else {
+         findLine(e, arr, mid+1, hi);
+      }
+   }
+
    $(".firstNoteOption").on("click", function() {
       firstNoteLength = parseInt($(this).attr("data-length"));
       repaintScore();
@@ -137,7 +200,7 @@ $(document).ready(function() {
 
    function displayResults() {
       $("#recordingBox").addClass("left");
-      $(".menu, #labelColumn").removeClass("hidden");
+      $(".menu, #labelColumn, #timingLineContainer").removeClass("hidden");
 
       numberOfBars = 0;
       noteCount    = 0;
@@ -322,8 +385,9 @@ $(document).ready(function() {
    }
 
    function placeReferenceLines() {
-      for (var i = 0; i < 2*totalSixteenths; i++) { // lines are spaced as 1/32 notes
-         var lineString = '<div class="timingLine';
+      var i;
+      for (i = 0; i < 2*totalSixteenths; i++) { // lines spaced as 1/32 notes
+         var lineString = '<div class="timingLine timingLine';
          if (i % 32 == 0) {
             lineString += '1';
          } else if (i % 8 == 0) {
@@ -335,6 +399,7 @@ $(document).ready(function() {
          }
          $("#timingLineContainer").append(lineString + '" style="left: ' + (10*i) + 'px"></div>');
       }
+      $("#timingLineContainer").css('width', 10*(i-1) + 'px');
    }
 
    function repaintScore() {
@@ -384,6 +449,46 @@ $(document).ready(function() {
       firstNoteLength = clickLengths[0];
       displayResults();
    }
+
+   /*function makeDraggable($lightBar) {
+      // prevent from overlapping?
+      $lightBar.resizable({
+         grid: [10, 1],
+         minHeight: 17,
+         maxHeight: 17,
+         handles: "e, w",
+         resize: function(e, ui) {
+            fixLeftOverflow(ui);
+            fixRightOverflow(ui);
+            //console.log("resizing");
+         },
+         stop: function(e, ui) {
+            fixOverlaps(ui);
+         }
+      });
+   }
+
+   function fixLeftOverflow(ui) {
+      if (ui.position.left < 0) {
+         ui.element.css('width', ui.size.width + ui.position.left);
+         ui.element.css('left', '0px');
+      }
+   }
+
+   function fixRightOverflow(ui) {
+      if (ui.position.left + ui.size.width >
+      $("#timingLineContainer").width()) {
+         var overflow = ui.position.left + ui.size.width - $("#timingLineContainer").width();
+         ui.element.css('width', ui.size.width - overflow + 'px');
+         alert('here');
+      }
+   }
+
+   function fixOverlaps(ui) {
+      $("." + ui.element.attr('data-light')).each(function() {
+         console.log($(this).css('left'));
+      });
+   }*/
 
    // taken from http://www.electrictoolbox.com/pad-number-zeroes-javascript/
    function pad(number, length) {
