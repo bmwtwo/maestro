@@ -148,7 +148,7 @@ $(document).ready(function() {
          }
 
          // only add a lightBar if one does not already exist at this position
-         $existingLightBar = $('.lightBar.' + lightBarClass + '[data-offset="' + $line.position().left + '"]');
+         $existingLightBar = $('.lightBar.' + lightBarClass + '[data-offset="' + Math.round($line.position().left) + '"]');
          if ($existingLightBar.length > 0) {
             if ($selectedLightBar !== null) $selectedLightBar.removeClass('lightBarSelected');
             $existingLightBar.addClass('lightBarSelected');
@@ -156,7 +156,7 @@ $(document).ready(function() {
             return;
          }
 
-         var lightBar = '<div class="lightBar ' + lightBarClass + '" data-light="light1" style="left: ' + $line.css('left') + '" data-offset="' + $line.position().left + '"></div>'; 
+         var lightBar = '<div class="lightBar ' + lightBarClass + '" data-light="light1" style="left: ' + $line.css('left') + '" data-offset="' + Math.round($line.position().left) + '"></div>'; 
          $('#timingLineContainer').append(lightBar);
          //makeDraggable($('.lightBar[style="left: ' + $line.css('left') + '"]'));
       }
@@ -186,7 +186,7 @@ $(document).ready(function() {
       updateRuntimeDisplay();
    });
 
-   $("#save").on("click", function() {
+   $("#saveNotes").on("click", function() {
       var sixteenthRef   = clickLengths[0] / firstNoteLength;
       output = firstNoteLength + ',';
       for (var i = 1; i < clickLengths.length; i++) {
@@ -195,6 +195,36 @@ $(document).ready(function() {
       }
       output += runTime;
       $("#saveDialog").children("textarea").val(output);
+      $("#saveDialog").dialog("open");
+   });
+
+   $("#saveChoreo").on("click", function() {
+      var lightIsOn = [false, false, false, false];
+      var timeSoFar = 0;
+      var output = '';
+      var containerWidth = $('#timingLineContainer').width();
+
+      for (var offset = 0; offset < containerWidth; offset+=10) {
+         var outputLine = '';
+         for (var i = 0; i < 4; i++) {
+            $lightBars = $('.light' + (i+1) + '[data-offset="' + offset + '"]');
+            if (lightIsOn[i] && $lightBars.length == 0) {
+               outputLine += i + ''  + 0;
+               lightIsOn[i] = false;
+            }
+            else if (!lightIsOn[i] && $lightBars.length > 0) {
+               outputLine += i + '' + 1;
+               lightIsOn[i] = true;
+            }
+         }
+         var currentTime = offset/containerWidth * runTime * 1000;
+         if (outputLine !== "") {
+            output += Math.round(currentTime - timeSoFar) + ' ' + outputLine + '\n';
+            timeSoFar += currentTime;
+         }
+      }
+
+      $("#saveDialog").children("textArea").val(output);
       $("#saveDialog").dialog("open");
    });
 
@@ -403,10 +433,12 @@ $(document).ready(function() {
    }
 
    function repaintScore() {
+      var lightBars = $('.lightbar');
       $("#noteContainer").html('<div id="timingLineContainer"></div>');
       selectedNoteID = null;
       $("#correctNoteMenu").parent().addClass("disabled");
       displayResults();
+      $('#timingLineContainer').append(lightBars);
    }
 
    function updateRuntime() {
