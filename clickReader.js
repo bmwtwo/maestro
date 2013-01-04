@@ -7,13 +7,15 @@ var firstNoteLength; // number of sixteenths in first note of the song
 var startTime;       // used to determine total runtime of the song
 var runTime;         // total length of song
 var totalSixteenths; // used to determine beats per minute
-var $selectedLightBar;
+var $selectedLightBars;
+var mousePressed;    // is the left mouse button down?
 
 $(document).ready(function() {
    // initialize variables and set defaults
    clickLengths   = new Array();
    selectedNoteID = null;
-   $selectedLightBar = null;
+   mousePressed = false;
+   $selectedLightBars = [];
    firstNoteLength = 4;
    $("#saveDialog").dialog({ autoOpen: false, modal: true });
    $("#loadDialog").dialog({
@@ -43,10 +45,10 @@ $(document).ready(function() {
 
    $(document).on("keydown", function(e) {
       if (event.keyCode == 8) { // delete key was pressed
-         if ($selectedLightBar !== null) {
-            $selectedLightBar.remove();
-            $selectedLightBar = null;
+         for (var i in $selectedLightBars) {
+            $selectedLightBars[i].remove();
          }
+         $selectedLightBars = [];
          return false;
       }
    });
@@ -117,14 +119,28 @@ $(document).ready(function() {
       selectedNoteID = noteID;
    });
 
-   $(document).on("click", "#timingLineContainer", function(e) {
+   $(document).on("mousedown", "#timingLineContainer", function(e) {
+      for (var i in $selectedLightBars) $selectedLightBars[i].removeClass('lightBarSelected');
+      $selectedLightBars = [];
       var arr = $(".timingLine");
       // -2 to prevent lightBars running off the end of the score
-      findLine(e, arr, 0, arr.length-2); 
+      findOrAddLine(e, arr, 0, arr.length-2); 
+      mousePressed = true;
+   });
+
+   $(document).on("mousemove", function(e) {
+      if (mousePressed) {
+         var arr = $(".timingLine");
+         findOrAddLine(e, arr, 0, arr.length - 2);
+      }
+   });
+
+   $(document).on("mouseup", function(e) {
+      mousePressed = false;
    });
 
    // binary search for the line closest to the position you clicked
-   function findLine(e, arr, lo, hi) {
+   function findOrAddLine(e, arr, lo, hi) {
       if (hi < lo) return;
 
       var mid = lo + Math.floor( (hi-lo)/2 );
@@ -150,9 +166,8 @@ $(document).ready(function() {
          // only add a lightBar if one does not already exist at this position
          $existingLightBar = $('.lightBar.' + lightBarClass + '[data-offset="' + Math.round($line.position().left) + '"]');
          if ($existingLightBar.length > 0) {
-            if ($selectedLightBar !== null) $selectedLightBar.removeClass('lightBarSelected');
             $existingLightBar.addClass('lightBarSelected');
-            $selectedLightBar = $existingLightBar;
+            $selectedLightBars.push($existingLightBar);
             return;
          }
 
@@ -161,10 +176,10 @@ $(document).ready(function() {
          //makeDraggable($('.lightBar[style="left: ' + $line.css('left') + '"]'));
       }
       else if (difference > 0) {
-         findLine(e, arr, lo, mid-1);
+         findOrAddLine(e, arr, lo, mid-1);
       }
       else {
-         findLine(e, arr, mid+1, hi);
+         findOrAddLine(e, arr, mid+1, hi);
       }
    }
 
