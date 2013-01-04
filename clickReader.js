@@ -204,7 +204,7 @@ $(document).ready(function() {
       var output = '';
       var containerWidth = $('#timingLineContainer').width();
 
-      for (var offset = 0; offset < containerWidth; offset+=10) {
+      for (var offset = 0; offset <= containerWidth; offset+=10) {
          var outputLine = '';
          for (var i = 0; i < 4; i++) {
             $lightBars = $('.light' + (i+1) + '[data-offset="' + offset + '"]');
@@ -418,7 +418,7 @@ $(document).ready(function() {
 
    function placeReferenceLines() {
       var i;
-      for (i = 0; i < 2*totalSixteenths; i++) { // lines spaced as 1/32 notes
+      for (i = 0; i <= 2*totalSixteenths; i++) { // lines spaced as 1/32 notes
          var lineString = '<div class="timingLine timingLine';
          if (i % 32 == 0) {
             lineString += '1';
