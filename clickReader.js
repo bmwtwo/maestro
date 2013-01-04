@@ -220,7 +220,9 @@ $(document).ready(function() {
          var currentTime = offset/containerWidth * runTime * 1000;
          if (outputLine !== "") {
             output += Math.round(currentTime - timeSoFar) + ' ' + outputLine + '\n';
-            timeSoFar += currentTime;
+            // TOOD: think about making this line more efficient when you're
+            // less tired
+            timeSoFar += Math.round(currentTime - timeSoFar);
          }
       }
 
